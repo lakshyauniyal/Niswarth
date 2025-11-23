@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Niswarth | Active Events & Campaigns</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/event.css">
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <h1>Active Charity Events & Campaigns</h1>
+      <p>Support real causes. Donate directly to verified NGOs.</p>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Events Section -->
+    <section class="section-block">
+      <h2 class="section-title">Active Events</h2>
+      <div id="eventsGrid" class="events-grid"></div>
+      <p id="noEvents" class="no-events" style="display:none;">No active events right now. Check back soon!</p>
+    </section>
+
+    <!-- Campaigns Section -->
+    <section class="section-block" style="margin-top: 3rem;">
+      <h2 class="section-title">Active Campaigns</h2>
+      <div id="campaignsGrid" class="events-grid"></div>
+      <p id="noCampaigns" class="no-events" style="display:none;">No active campaigns right now.</p>
+    </section>
+
+  </div>
+
+  <!-- Donation Modal  -->
+  <div id="donateModal" class="modal-overlay">
+    <div class="modal">
+      <button class="modal-close" onclick="closeDonateModal()">x</button>
+      <h3 id="modalTitle">Donate to Event</h3>
+      <p>Scan the QR or paste your UPI Transaction ID after payment.</p>
+
+      <div class="qr-code">
+        <img id="qrImage" src="" alt="UPI QR Code">
+        <p><strong>UPI ID:</strong> <span id="upiId">loading...</span></p>
+      </div>
+
+      <form id="donateForm">
+        <div class="input-group">
+          <label>Your Name *</label>
+          <input type="text" id="donorName" required />
+        </div>
+        <div class="input-group">
+          <label>Amount (₹) *</label>
+          <input type="number" id="donateAmount" min="1" required />
+        </div>
+        <div class="input-group">
+          <label>Transaction ID (from UPI app) *</label>
+          <input type="text" id="txId" placeholder="e.g. 123456789012" required />
+        </div>
+        <div class="input-group">
+          <label>Message (Optional)</label>
+          <textarea id="donorMessage" rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn-primary">Submit Donation</button>
+      </form>
+      <p class="success-msg" id="successMsg">Thank you! Your donation is being verified.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2025 Niswarth | Made with <i class="fas fa-heart" style="color:#e74c3c;"></i> in India</p>
+  </footer>
+
+  <script type="module" src="js/event.js"></script>
+</body>
+</html>

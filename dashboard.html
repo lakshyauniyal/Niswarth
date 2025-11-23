@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Niswarth | NGO Dashboard</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h2>NISWARTH</h2>
+            <p>NGO Dashboard</p>
+        </div>
+        <ul class="nav-menu">
+            <li><a href="#overview" class="active"><i class="fas fa-tachometer-alt"></i> Overview</a></li>
+            <li><a href="#donations"><i class="fas fa-rupee-sign"></i> Donations</a></li>
+            <li><a href="#events"><i class="fas fa-calendar-alt"></i> Events</a></li>
+            <li><a href="#campaigns"><i class="fas fa-bullhorn"></i> Campaigns</a></li>
+            <li><a href="#impact"><i class="fas fa-chart-line"></i> Impact</a></li>
+            <li><a href="#profile"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button id="darkModeToggle" class="icon-btn"><i class="fas fa-moon"></i></button>
+            <button id="logoutBtn" class="icon-btn"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="header">
+            <button class="menu-toggle"><i class="fas fa-bars"></i></button>
+            <h1>Welcome, <span id="ngoName">NGO</span></h1>
+            <div class="header-time" id="currentTime"></div>
+        </header>
+
+        <!-- Overview -->
+        <section id="overview" class="section active">
+            <div class="container">
+                <h2>Quick Stats</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-rupee-sign"></i>
+                        <div class="stat-value" data-target="1970000">₹0</div>
+                        <p>Total Donated</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-value" data-target="1250">0</div>
+                        <p>Donors</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-heart"></i>
+                        <div class="stat-value" data-target="5000">0</div>
+                        <p>Lives Impacted</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="stat-value" data-target="3">0</div>
+                        <p>Active Events</p>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="chart-card">
+                        <h3>Donation Trend</h3>
+                    </div>
+                    <div class="quick-actions">
+                        <h3>Quick Actions</h3>
+                        <button id="quickNewEventBtn" class="action-btn"><i class="fas fa-plus"></i> New Event</button>
+                        <button id="quickNewCampaignBtn" class="action-btn"><i class="fas fa-bullhorn"></i> Launch Campaign</button>
+                        <button class="action-btn"><i class="fas fa-download"></i> Export Report</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Donations -->
+        <section id="donations" class="section">
+            <div class="container">
+                <h2>Recent Donations</h2>
+                <div class="table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Donor</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                                <th>Transaction ID</th> <!-- NEW COLUMN -->
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donationsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Events -->
+        <section id="events" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Upcoming Events</h2>
+                    <button id="addEventBtn" class="btn-primary"><i class="fas fa-plus"></i> Add Event</button>
+                </div>
+
+                <!-- Create Event Card -->
+                <div id="createEventCard" class="event-create-card" style="display:none;">
+                    <div class="card-header">
+                        <h3>Create New Event</h3>
+                        <button id="cancelCreateBtn" class="close-card">×</button>
+                    </div>
+                    <form id="createEventForm">
+                        <div class="input-group">
+                            <label>Title *</label>
+                            <input type="text" id="eventTitle" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Description *</label>
+                            <textarea id="eventDesc" rows="3" required></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Date *</label>
+                            <input type="date" id="eventDate" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Location *</label>
+                            <input type="text" id="eventLocation" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Donation Goal (₹)</label>
+                            <input type="number" id="eventGoal" min="0" value="0" />
+                        </div>
+                        <button type="submit" class="btn-primary">Create Event</button>
+                    </form>
+                </div>
+
+                <!-- Edit Event Card -->
+                <div id="editEventCard" class="event-create-card" style="display:none;">
+                    <div class="card-header">
+                        <h3>Edit Event</h3>
+                        <button id="cancelEditBtn" class="close-card">×</button>
+                    </div>
+                    <form id="editEventForm">
+                        <input type="hidden" id="editEventId" />
+                        <div class="input-group">
+                            <label>Title *</label>
+                            <input type="text" id="editEventTitle" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Description *</label>
+                            <textarea id="editEventDesc" rows="3" required></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Date *</label>
+                            <input type="date" id="editEventDate" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Location *</label>
+                            <input type="text" id="editEventLocation" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Donation Goal (₹)</label>
+                            <input type="number" id="editEventGoal" min="0" value="0" />
+                        </div>
+                        <button type="submit" class="btn-primary">Update Event</button>
+                    </form>
+                </div>
+
+                <div id="eventsGrid" class="cards-grid"></div>
+            </div>
+        </section>
+
+        <!-- Campaigns -->
+        <section id="campaigns" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Active Campaigns</h2>
+                    <button id="addCampaignBtn" class="btn-primary"><i class="fas fa-plus"></i> Add Campaign</button>
+                </div>
+
+                <!-- Create Campaign Card -->
+                <div id="createCampaignCard" class="event-create-card" style="display:none;">
+                    <div class="card-header">
+                        <h3>Create New Campaign</h3>
+                        <button id="cancelCreateCampaignBtn" class="close-card">×</button>
+                    </div>
+                    <form id="createCampaignForm">
+                        <div class="input-group">
+                            <label>Title *</label>
+                            <input type="text" id="campaignTitle" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Description *</label>
+                            <textarea id="campaignDesc" rows="3" required></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Status</label>
+                            <select id="campaignStatus">
+                                <option value="planning">Planning</option>
+                                <option value="active" selected>Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="paused">Paused</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Create Campaign</button>
+                    </form>
+                </div>
+
+                <!-- Edit Campaign Card -->
+                <div id="editCampaignCard" class="event-create-card" style="display:none;">
+                    <div class="card-header">
+                        <h3>Edit Campaign</h3>
+                        <button id="cancelEditCampaignBtn" class="close-card">×</button>
+                    </div>
+                    <form id="editCampaignForm">
+                        <input type="hidden" id="editCampaignId" />
+                        <div class="input-group">
+                            <label>Title *</label>
+                            <input type="text" id="editCampaignTitle" required />
+                        </div>
+                        <div class="input-group">
+                            <label>Description *</label>
+                            <textarea id="editCampaignDesc" rows="3" required></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label>Status</label>
+                            <select id="editCampaignStatus">
+                                <option value="planning">Planning</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="paused">Paused</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary">Update Campaign</button>
+                    </form>
+                </div>
+
+                <div id="campaignsGrid" class="cards-grid"></div>
+            </div>
+        </section>
+
+        <!-- Impact -->
+        <section id="impact" class="section">
+            <div class="container">
+                <h2>Impact Metrics</h2>
+                <div class="impact-grid">
+                    <div class="impact-card">
+                        <i class="fas fa-child"></i>
+                        <div class="impact-value" data-target="2500">0</div>
+                        <p>Children Educated</p>
+                    </div>
+                    <div class="impact-card">
+                        <i class="fas fa-tree"></i>
+                        <div class="impact-value" data-target="12000">0</div>
+                        <p>Trees Planted</p>
+                    </div>
+                    <div class="impact-card">
+                        <i class="fas fa-hands-helping"></i>
+                        <div class="impact-value" data-target="450">0</div>
+                        <p>Volunteers</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings -->
+        <section id="profile" class="section">
+            <div class="container">
+                <h2>Profile Settings</h2>
+                <form id="profileForm" class="form-card">
+                    <div class="input-group">
+                        <label>NGO Name</label>
+                        <input type="text" id="profileName" required />
+                    </div>
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="profileEmail" required />
+                    </div>
+                    <div class="input-group">
+                        <label>Phone</label>
+                        <input type="tel" id="profilePhone" required />
+                    </div>
+                    <div class="input-group">
+                        <label>UPI ID (for receiving donations)</label>
+                        <input type="text" id="profileUpiId" placeholder="yourname@upi" />
+                        <small style="color:#666;">e.g. ngo@example.upi</small>
+                    </div>
+                    <button type="submit" class="btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/dashboard.js"></script>
+</body>
+</html>
